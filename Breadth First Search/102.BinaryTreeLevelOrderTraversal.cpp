@@ -1,56 +1,38 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
-class Solution {
-public:
-    vector<vector<int>> ret;
+vector<vector<int>> levelOrder(TreeNode *root)
+{
+    if (!root)
+        return {}; // return if root is null
+    queue<TreeNode *> q;
+    q.push(root);            //push the root node.
+    vector<vector<int>> out; //result vector
 
-    void buildVector(TreeNode *root, int depth)
+    /*
+		 * Idea is to create a vector for every level based on the queue size.
+		 * eg: if a level has four elements say 1, 2, 3, 4 -> Then create a vector of size 4.
+		 * 
+		 * note: size of the queue is computed before the loop, so that we don't consider 
+		 * newly pushed elements.
+		 */
+
+    while (!q.empty())
     {
-        if(root == NULL) return;
-        if(ret.size() == depth)
-            ret.push_back(vector<int>());
 
-        ret[depth].push_back(root->val);
-        buildVector(root->left, depth + 1);
-        buildVector(root->right, depth + 1);
-    }
+        int sz = q.size();    /* current queue size */
+        vector<int> curr(sz); /* vector of size sz */
 
-    vector<vector<int> > levelOrder(TreeNode *root) {
-        buildVector(root, 0);
-        return ret;
-    }
-};
-
-void level(TreeNode *root, vector<vector<int>>& res, int lvl)
-    {
-        if(!root)
-            return;
-        if(lvl ==res.size())
+        for (int i = 0; i < sz; i++)
         {
-            vector<int> temp;
-            res.push_back(temp);
+            TreeNode *tmp = q.front();
+            q.pop();
+            curr[i] = tmp->val; /* insert to the correct index */
+
+            /* Add the left & right nodes to the queue in the loop. */
+            if (tmp->left)
+                q.push(tmp->left);
+            if (tmp->right)
+                q.push(tmp->right);
         }
-        res[lvl].push_back(root->val);
-        level(root->left, res, lvl+1);
-        level(root->right, res, lvl+1);
-        return ;
+        out.push_back(curr); /* once the level is done, push the vector to output vector. */
     }
-
-    vector<vector<int>> levelOrder(TreeNode* root) {
-        vector<vector<int>> res;
-        if(!root)
-            return res;
-        level(root, res, 0);
-        return res;
-
-    }
-
+    return out;
+}
